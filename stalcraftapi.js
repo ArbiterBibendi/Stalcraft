@@ -1,99 +1,153 @@
-const ENDPOINTS = [
-  "https://eapi.stalcraft.net/regions",
-  "https://eapi.stalcraft.net/{region}/emission",
-  "https://eapi.stalcraft.net/{region}/friends/{character}",
-  "https://eapi.stalcraft.net/{region}/auction/{item}/history",
-  "https://eapi.stalcraft.net/{region}/auction/{item}/lots",
-  "https://eapi.stalcraft.net/{region}/character/by-name/{character}/profile",
-  "https://eapi.stalcraft.net/{region}/characters",
-  "https://eapi.stalcraft.net/{region}/clan/{clan-id}/info",
-  "https://eapi.stalcraft.net/{region}/clan/{clan-id}/members",
-  "https://eapi.stalcraft.net/{region}/clans",
-];
+require("dotenv").config();
+const ENDPOINTS = {
+  GetRegions: {
+    base_url: "https://dapi.stalcraft.net/regions",
+    auth_type: "application",
+  },
+  GetEmissionStatus: {
+    base_url: "https://dapi.stalcraft.net/{region}/emission",
+    auth_type: "application",
+  },
+  GetFriends: {
+    base_url: "https://dapi.stalcraft.net/{region}/friends/{character}",
+    auth_type: "user",
+  },
+  GetAuction: {
+    base_url: "https://dapi.stalcraft.net/{region}/auction/{item}/history",
+    auth_type: "application",
+  },
+  GetAuction: {
+    base_url: "https://dapi.stalcraft.net/{region}/auction/{item}/lots",
+    auth_type: "application",
+  },
+  GetCharacterProfile: {
+    base_url:
+      "https://dapi.stalcraft.net/{region}/character/by-name/{character}/profile",
+    auth_type: "application",
+  },
+  GetCharacterList: {
+    base_url: "https://dapi.stalcraft.net/{region}/characters",
+    auth_type: "user",
+  },
+  GetClanInfo: {
+    base_url: "https://dapi.stalcraft.net/{region}/clan/{clan-id}/info",
+    auth_type: "application",
+  },
+  GetClanMembers: {
+    base_url: "https://dapi.stalcraft.net/{region}/clan/{clan-id}/members",
+    auth_type: "user",
+  },
+  GetClanList: {
+    base_url: "https://dapi.stalcraft.net/{region}/clans",
+    auth_type: "application",
+  },
+};
+
 const regions = {
   NA: "NA",
   RU: "RU",
   EU: "EU",
   SEA: "SEA",
 };
+const getKey = (endpoint) => {
+    const isApplication = endpoint.auth_type === "application";
+    return isApplication ? process.env.APPLICATION_KEY : process.env.USER_KEY;
+}
 const defaultRegion = regions.NA;
-const api_key = process.env.API_KEY;
 const GetRegions = async () => {
-  const endpoint = `https://eapi.stalcraft.net/regions`;
+  const endpoint = ENDPOINTS.GetRegions.base_url;
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${api_key}` },
+    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetRegions)}` },
   });
   const body = await response.json();
   return body;
 };
 const GetEmissionStatus = async (region = defaultRegion) => {
-  const endpoint = `https://eapi.stalcraft.net/${region}/emission`;
+  const endpoint = ENDPOINTS.GetEmissionStatus.base_url.replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${api_key}` },
+    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetEmissionStatus)}` },
   });
   const body = await response.json();
   return body;
 };
 const GetFriends = async (character, region = defaultRegion) => {
-  const endpoint = `https://eapi.stalcraft.net/${region}/friends/${character}`;
+  const endpoint = ENDPOINTS.GetFriends.base_url.replace(
+    "{character}",
+    character
+  ).replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${api_key}` },
+    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetFriends)}` },
   });
   const body = await response.json();
   return body;
 };
-const GetAuctionPriceHistory = async (item, region = defaultRegion) => {
-  const endpoint = `https://eapi.stalcraft.net/${region}/auction/${item}/history`;
+const GetAuctionPriceHistory = async (itemId, region = defaultRegion) => {
+  const endpoint = ENDPOINTS.GetAuctionPriceHistory.base_url.replace(
+    "{item}",
+    itemId
+  ).replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${api_key}` },
+    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetAuctionPriceHistory)}` },
   });
   const body = await response.json();
   return body;
 };
-const GetAuction = async (item, region = defaultRegion) => {
-  const endpoint = `https://eapi.stalcraft.net/${region}/auction/${item}/lots`;
+const GetAuction = async (itemId, region = defaultRegion) => {
+  const endpoint = ENDPOINTS.GetAuction.base_url.replace("{item}", itemId).replace(
+    "{region}",
+    region
+  );
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${api_key}` },
+    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetAuction)}` },
   });
   const body = await response.json();
   return body;
 };
 const GetCharacterProfile = async (character, region = defaultRegion) => {
-  const endpoint = `https://eapi.stalcraft.net/${region}/character/by-name/${character}/profile`;
+  const endpoint = ENDPOINTS.GetCharacterProfile.base_url.replace(
+    "{character}",
+    character
+  ).replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${api_key}` },
+    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetCharacterProfile)}` },
   });
   const body = await response.json();
   return body;
 };
 const GetCharacterList = async (region = defaultRegion) => {
-  const endpoint = `https://eapi.stalcraft.net/${region}/characters`;
+  const endpoint = ENDPOINTS.GetCharacterList.base_url.replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${api_key}` },
+    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetCharacterList)}` },
   });
   const body = await response.json();
   return body;
 };
 const GetClanInfo = async (clan_id, region = defaultRegion) => {
-  const endpoint = `https://eapi.stalcraft.net/${region}/clan/${clan_id}/info`;
+  const endpoint = ENDPOINTS.GetClanInfo.base_url.replace("{clan-id}", clan_id).replace(
+    "{region}",
+    region
+  );
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${api_key}` },
+    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetClanInfo)}` },
   });
   const body = await response.json();
   return body;
 };
 const GetClanMembers = async (clan_id, region = defaultRegion) => {
-  const endpoint = `https://eapi.stalcraft.net/${region}/clan/${clan_id}/members`;
+  const endpoint = ENDPOINTS.GetClanMembers.base_url.replace(
+    "{clan-id}",
+    clan_id
+  ).replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${api_key}` },
+    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetClanMembers)}` },
   });
   const body = await response.json();
   return body;
 };
 const GetClanList = async (region = defaultRegion) => {
-  const endpoint = `https://eapi.stalcraft.net/${region}/clans`;
+  const endpoint = ENDPOINTS.GetClanList.base_url.replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${api_key}` },
+    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetClanList)}` },
   });
   const body = await response.json();
   return body;
