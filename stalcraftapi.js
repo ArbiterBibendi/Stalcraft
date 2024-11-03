@@ -28,30 +28,75 @@ const GetRegions = async () => {
 };
 const GetEmissionStatus = async (region = defaultRegion) => {
   const endpoint = `https://eapi.stalcraft.net/${region}/emission`;
+  const response = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${api_key}` },
+  });
+  const body = await response.json();
+  return body;
 };
 const GetFriends = async (character, region = defaultRegion) => {
   const endpoint = `https://eapi.stalcraft.net/${region}/friends/${character}`;
+  const response = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${api_key}` },
+  });
+  const body = await response.json();
+  return body;
 };
 const GetAuctionPriceHistory = async (item, region = defaultRegion) => {
   const endpoint = `https://eapi.stalcraft.net/${region}/auction/${item}/history`;
+  const response = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${api_key}` },
+  });
+  const body = await response.json();
+  return body;
 };
 const GetAuction = async (item, region = defaultRegion) => {
   const endpoint = `https://eapi.stalcraft.net/${region}/auction/${item}/lots`;
+  const response = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${api_key}` },
+  });
+  const body = await response.json();
+  return body;
 };
 const GetCharacterProfile = async (character, region = defaultRegion) => {
   const endpoint = `https://eapi.stalcraft.net/${region}/character/by-name/${character}/profile`;
+  const response = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${api_key}` },
+  });
+  const body = await response.json();
+  return body;
 };
 const GetCharacterList = async (region = defaultRegion) => {
   const endpoint = `https://eapi.stalcraft.net/${region}/characters`;
+  const response = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${api_key}` },
+  });
+  const body = await response.json();
+  return body;
 };
 const GetClanInfo = async (clan_id, region = defaultRegion) => {
   const endpoint = `https://eapi.stalcraft.net/${region}/clan/${clan_id}/info`;
+  const response = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${api_key}` },
+  });
+  const body = await response.json();
+  return body;
 };
 const GetClanMembers = async (clan_id, region = defaultRegion) => {
   const endpoint = `https://eapi.stalcraft.net/${region}/clan/${clan_id}/members`;
+  const response = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${api_key}` },
+  });
+  const body = await response.json();
+  return body;
 };
 const GetClanList = async (region = defaultRegion) => {
   const endpoint = `https://eapi.stalcraft.net/${region}/clans`;
+  const response = await fetch(endpoint, {
+    headers: { Authorization: `Bearer ${api_key}` },
+  });
+  const body = await response.json();
+  return body;
 };
 
 module.exports.GetRegions = GetRegions;
