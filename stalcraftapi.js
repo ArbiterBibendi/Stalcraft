@@ -1,3 +1,5 @@
+const { URLSearchParams } = require("url");
+
 require("dotenv").config();
 const ENDPOINTS = {
   GetRegions: {
@@ -50,9 +52,9 @@ const regions = {
   SEA: "SEA",
 };
 const getKey = (endpoint) => {
-    const isApplication = endpoint.auth_type === "application";
-    return isApplication ? process.env.APPLICATION_KEY : process.env.USER_KEY;
-}
+  const isApplication = endpoint.auth_type === "application";
+  return isApplication ? process.env.APPLICATION_KEY : process.env.USER_KEY;
+};
 const defaultRegion = regions.NA;
 const GetRegions = async () => {
   const endpoint = ENDPOINTS.GetRegions.base_url;
@@ -63,7 +65,10 @@ const GetRegions = async () => {
   return body;
 };
 const GetEmissionStatus = async (region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetEmissionStatus.base_url.replace("{region}", region);
+  const endpoint = ENDPOINTS.GetEmissionStatus.base_url.replace(
+    "{region}",
+    region
+  );
   const response = await fetch(endpoint, {
     headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetEmissionStatus)}` },
   });
@@ -71,32 +76,41 @@ const GetEmissionStatus = async (region = defaultRegion) => {
   return body;
 };
 const GetFriends = async (character, region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetFriends.base_url.replace(
-    "{character}",
-    character
-  ).replace("{region}", region);
+  const endpoint = ENDPOINTS.GetFriends.base_url
+    .replace("{character}", character)
+    .replace("{region}", region);
   const response = await fetch(endpoint, {
     headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetFriends)}` },
   });
   const body = await response.json();
   return body;
 };
-const GetAuctionPriceHistory = async (itemId, region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetAuctionPriceHistory.base_url.replace(
-    "{item}",
-    itemId
-  ).replace("{region}", region);
+const GetAuctionPriceHistory = async (
+  itemId,
+  region = defaultRegion,
+  urlSearchParams = new URLSearchParams()
+) => {
+  const endpoint =
+    ENDPOINTS.GetAuctionPriceHistory.base_url
+      .replace("{item}", itemId)
+      .replace("{region}", region) + `?${urlSearchParams.toString()}`;
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetAuctionPriceHistory)}` },
+    headers: {
+      Authorization: `Bearer ${getKey(ENDPOINTS.GetAuctionPriceHistory)}`,
+    },
   });
   const body = await response.json();
   return body;
 };
-const GetAuction = async (itemId, region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetAuction.base_url.replace("{item}", itemId).replace(
-    "{region}",
-    region
-  );
+const GetAuction = async (
+  itemId,
+  region = defaultRegion,
+  urlSearchParams = new URLSearchParams()
+) => {
+  const endpoint =
+    ENDPOINTS.GetAuction.base_url
+      .replace("{item}", itemId)
+      .replace("{region}", region) + `?${urlSearchParams.toString()}`;
   const response = await fetch(endpoint, {
     headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetAuction)}` },
   });
@@ -104,18 +118,22 @@ const GetAuction = async (itemId, region = defaultRegion) => {
   return body;
 };
 const GetCharacterProfile = async (character, region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetCharacterProfile.base_url.replace(
-    "{character}",
-    character
-  ).replace("{region}", region);
+  const endpoint = ENDPOINTS.GetCharacterProfile.base_url
+    .replace("{character}", character)
+    .replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetCharacterProfile)}` },
+    headers: {
+      Authorization: `Bearer ${getKey(ENDPOINTS.GetCharacterProfile)}`,
+    },
   });
   const body = await response.json();
   return body;
 };
 const GetCharacterList = async (region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetCharacterList.base_url.replace("{region}", region);
+  const endpoint = ENDPOINTS.GetCharacterList.base_url.replace(
+    "{region}",
+    region
+  );
   const response = await fetch(endpoint, {
     headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetCharacterList)}` },
   });
@@ -123,10 +141,9 @@ const GetCharacterList = async (region = defaultRegion) => {
   return body;
 };
 const GetClanInfo = async (clan_id, region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetClanInfo.base_url.replace("{clan-id}", clan_id).replace(
-    "{region}",
-    region
-  );
+  const endpoint = ENDPOINTS.GetClanInfo.base_url
+    .replace("{clan-id}", clan_id)
+    .replace("{region}", region);
   const response = await fetch(endpoint, {
     headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetClanInfo)}` },
   });
@@ -134,18 +151,22 @@ const GetClanInfo = async (clan_id, region = defaultRegion) => {
   return body;
 };
 const GetClanMembers = async (clan_id, region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetClanMembers.base_url.replace(
-    "{clan-id}",
-    clan_id
-  ).replace("{region}", region);
+  const endpoint = ENDPOINTS.GetClanMembers.base_url
+    .replace("{clan-id}", clan_id)
+    .replace("{region}", region);
   const response = await fetch(endpoint, {
     headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetClanMembers)}` },
   });
   const body = await response.json();
   return body;
 };
-const GetClanList = async (region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetClanList.base_url.replace("{region}", region);
+const GetClanList = async (
+  region = defaultRegion,
+  urlSearchParams = new URLSearchParams()
+) => {
+  const endpoint =
+    ENDPOINTS.GetClanList.base_url.replace("{region}", region) +
+    `?${urlSearchParams.toString()}`;
   const response = await fetch(endpoint, {
     headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetClanList)}` },
   });
