@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "../.env" });
+require("dotenv").config();
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 const token = process.env.DISCORD_KEY;
 const clientId = process.env.DISCORD_CLIENTID;
@@ -10,7 +10,7 @@ const command = new SlashCommandBuilder()
   "Notify user when an item is on auction for a range of prices"
 )
 .addStringOption((option) =>
-  option.setName("name").setDescription("Name of item").setRequired(true)
+  option.setName("name").setDescription("Name of item").setRequired(true).setAutocomplete(true)
 )
 .addNumberOption((option) =>
   option.setName("min_price").setDescription("Minimum price").setRequired(true)
@@ -19,7 +19,32 @@ const command = new SlashCommandBuilder()
   option.setName("max_price").setDescription("Maximum price").setRequired(true)
 )
 .addStringOption((option) => 
-    option.setName("rarity").setDescription("Item rarity")
+    option.setName("rarity").setDescription("Item rarity").setChoices([ //white common, Green Uncommon, blue special, pink rare, red exclusive, yellow legendary
+      {
+        name: "Common",
+        value: "common",
+      },
+      {
+        name: "Uncommon",
+        value: "uncommon"
+      },
+      {
+        name: "Special",
+        value: "special"
+      },
+      {
+        name: "Rare",
+        value: "rare"
+      },
+      {
+        name: "Exclusive",
+        value: "exclusive"
+      },
+      {
+        name: "Legendary",
+        value: "legendary"
+      },
+    ])
 )
 .addNumberOption((option) => 
     option.setName("min_level").setDescription("Item's minimum upgrade level")
