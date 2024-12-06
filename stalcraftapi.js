@@ -20,7 +20,7 @@ const ENDPOINTS = {
     base_url: getUrl(env) + "/{region}/friends/{character}",
     auth_type: "user",
   },
-  GetAuction: {
+  GetAuctionPriceHistory: {
     base_url: getUrl(env) + "/{region}/auction/{item}/history",
     auth_type: "application",
   },
