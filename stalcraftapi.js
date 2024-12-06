@@ -57,7 +57,9 @@ const regions = {
 };
 const getKey = (endpoint) => {
   const isApplication = endpoint.auth_type === "application";
-  return isApplication ? process.env.APPLICATION_KEY : process.env.USER_KEY;
+  const applicationKey = "prod" ? process.env.APPLICATION_KEY : process.env.DEMO_APPLICATION_KEY;
+  const userKey = "prod" ? process.env.USER_KEY : process.env.DEMO_USER_KEY;
+  return isApplication ? applicationKey : userKey;
 };
 const defaultRegion = regions.NA;
 const GetRegions = async () => {
