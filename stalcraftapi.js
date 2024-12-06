@@ -3,8 +3,10 @@ const { URLSearchParams } = require("url");
 require("dotenv").config();
 const env = process.env.ENVIRONMENT;
 const getUrl = (environment) => {
-  return environment == "prod" ? "https://eapi.stalcraft.net" : "https://dapi.stalcraft.net";
-}
+  return environment == "prod"
+    ? "https://eapi.stalcraft.net"
+    : "https://dapi.stalcraft.net";
+};
 const ENDPOINTS = {
   GetRegions: {
     base_url: getUrl(env) + "/regions",
@@ -27,8 +29,7 @@ const ENDPOINTS = {
     auth_type: "application",
   },
   GetCharacterProfile: {
-    base_url:
-      getUrl(env) + "/{region}/character/by-name/{character}/profile",
+    base_url: getUrl(env) + "/{region}/character/by-name/{character}/profile",
     auth_type: "application",
   },
   GetCharacterList: {
@@ -55,17 +56,34 @@ const regions = {
   EU: "EU",
   SEA: "SEA",
 };
-const getKey = (endpoint) => {
+const getKeys = (endpoint) => {
   const isApplication = endpoint.auth_type === "application";
-  const applicationKey = "prod" ? process.env.APPLICATION_KEY : process.env.DEMO_APPLICATION_KEY;
-  const userKey = "prod" ? process.env.USER_KEY : process.env.DEMO_USER_KEY;
+  const applicationKey =
+    process.env.ENVIRONMENT == "prod"
+      ? process.env.APPLICATION_KEY
+      : process.env.DEMO_APPLICATION_KEY;
+  const userKey =
+    process.env.ENVIRONMENT == "prod"
+      ? process.env.USER_KEY
+      : process.env.DEMO_USER_KEY;
   return isApplication ? applicationKey : userKey;
+};
+const getHeaders = (endpoint) => {
+  if (env == "prod") {
+    return {
+      "Client-Id": process.env.CLIENT_ID,
+      "Client-Secret": process.env.CLIENT_SECRET,
+    };
+  } else {
+    return { Authorization: `Bearer ${getKey(endpoint)}` };
+  }
 };
 const defaultRegion = regions.NA;
 const GetRegions = async () => {
   const endpoint = ENDPOINTS.GetRegions.base_url;
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetRegions)}` },
+    headers: getHeaders(ENDPOINTS.GetRegions),
+    cache: "no-store",
   });
   const body = await response.json();
   return body;
@@ -76,7 +94,8 @@ const GetEmissionStatus = async (region = defaultRegion) => {
     region
   );
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetEmissionStatus)}` },
+    headers: getHeaders(ENDPOINTS.GetEmissionStatus),
+    cache: "no-store",
   });
   const body = await response.json();
   return body;
@@ -86,7 +105,8 @@ const GetFriends = async (character, region = defaultRegion) => {
     .replace("{character}", character)
     .replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetFriends)}` },
+    headers: getHeaders(ENDPOINTS.GetFriends),
+    cache: "no-store",
   });
   const body = await response.json();
   return body;
@@ -101,9 +121,8 @@ const GetAuctionPriceHistory = async (
       .replace("{item}", itemId)
       .replace("{region}", region) + `?${urlSearchParams.toString()}`;
   const response = await fetch(endpoint, {
-    headers: {
-      Authorization: `Bearer ${getKey(ENDPOINTS.GetAuctionPriceHistory)}`,
-    },
+    headers: getHeaders(ENDPOINTS.GetAuctionPriceHistory),
+    cache: "no-store",
   });
   const body = await response.json();
   return body;
@@ -118,7 +137,8 @@ const GetAuction = async (
       .replace("{item}", itemId)
       .replace("{region}", region) + `?${urlSearchParams.toString()}`;
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetAuction)}` },
+    headers: getHeaders(ENDPOINTS.GetAuction),
+    cache: "no-store",
   });
   const body = await response.json();
   return body;
@@ -128,9 +148,8 @@ const GetCharacterProfile = async (character, region = defaultRegion) => {
     .replace("{character}", character)
     .replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: {
-      Authorization: `Bearer ${getKey(ENDPOINTS.GetCharacterProfile)}`,
-    },
+    headers: getHeaders(ENDPOINTS.GetCharacterProfile),
+    cache: "no-store",
   });
   const body = await response.json();
   return body;
@@ -141,7 +160,8 @@ const GetCharacterList = async (region = defaultRegion) => {
     region
   );
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetCharacterList)}` },
+    headers: getHeaders(ENDPOINTS.GetCharacterList),
+    cache: "no-store",
   });
   const body = await response.json();
   return body;
@@ -151,7 +171,8 @@ const GetClanInfo = async (clan_id, region = defaultRegion) => {
     .replace("{clan-id}", clan_id)
     .replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetClanInfo)}` },
+    headers: getHeaders(ENDPOINTS.GetClanInfo),
+    cache: "no-store",
   });
   const body = await response.json();
   return body;
@@ -161,7 +182,8 @@ const GetClanMembers = async (clan_id, region = defaultRegion) => {
     .replace("{clan-id}", clan_id)
     .replace("{region}", region);
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetClanMembers)}` },
+    headers: getHeaders(ENDPOINTS.GetClanMembers),
+    cache: "no-store",
   });
   const body = await response.json();
   return body;
@@ -174,7 +196,8 @@ const GetClanList = async (
     ENDPOINTS.GetClanList.base_url.replace("{region}", region) +
     `?${urlSearchParams.toString()}`;
   const response = await fetch(endpoint, {
-    headers: { Authorization: `Bearer ${getKey(ENDPOINTS.GetClanList)}` },
+    headers: getHeaders(ENDPOINTS.GetClanList),
+    cache: "no-store",
   });
   const body = await response.json();
   return body;
