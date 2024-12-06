@@ -1,46 +1,50 @@
 const { URLSearchParams } = require("url");
 
 require("dotenv").config();
+const env = process.env.ENVIRONMENT;
+const getUrl = (environment) => {
+  return environment == "prod" ? "https://eapi.stalcraft.net" : "https://dapi.stalcraft.net";
+}
 const ENDPOINTS = {
   GetRegions: {
-    base_url: "https://dapi.stalcraft.net/regions",
+    base_url: getUrl(env) + "/regions",
     auth_type: "application",
   },
   GetEmissionStatus: {
-    base_url: "https://dapi.stalcraft.net/{region}/emission",
+    base_url: getUrl(env) + "/{region}/emission",
     auth_type: "application",
   },
   GetFriends: {
-    base_url: "https://dapi.stalcraft.net/{region}/friends/{character}",
+    base_url: getUrl(env) + "/{region}/friends/{character}",
     auth_type: "user",
   },
   GetAuction: {
-    base_url: "https://dapi.stalcraft.net/{region}/auction/{item}/history",
+    base_url: getUrl(env) + "/{region}/auction/{item}/history",
     auth_type: "application",
   },
   GetAuction: {
-    base_url: "https://dapi.stalcraft.net/{region}/auction/{item}/lots",
+    base_url: getUrl(env) + "/{region}/auction/{item}/lots",
     auth_type: "application",
   },
   GetCharacterProfile: {
     base_url:
-      "https://dapi.stalcraft.net/{region}/character/by-name/{character}/profile",
+      getUrl(env) + "/{region}/character/by-name/{character}/profile",
     auth_type: "application",
   },
   GetCharacterList: {
-    base_url: "https://dapi.stalcraft.net/{region}/characters",
+    base_url: getUrl(env) + "/{region}/characters",
     auth_type: "user",
   },
   GetClanInfo: {
-    base_url: "https://dapi.stalcraft.net/{region}/clan/{clan-id}/info",
+    base_url: getUrl(env) + "/{region}/clan/{clan-id}/info",
     auth_type: "application",
   },
   GetClanMembers: {
-    base_url: "https://dapi.stalcraft.net/{region}/clan/{clan-id}/members",
+    base_url: getUrl(env) + "/{region}/clan/{clan-id}/members",
     auth_type: "user",
   },
   GetClanList: {
-    base_url: "https://dapi.stalcraft.net/{region}/clans",
+    base_url: getUrl(env) + "/{region}/clans",
     auth_type: "application",
   },
 };
