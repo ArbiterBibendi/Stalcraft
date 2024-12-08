@@ -6,9 +6,17 @@ module.exports.filterByQuality = (lots, qlt) => {
         return lot.additional.qlt == qlt;
     });
 }
-module.exports.getAveragePrice = (lots) => {
+module.exports.getAveragePriceCurrent = (lots) => {
     const totalPrice = lots.reduce((acc, currentVal) => {
         return acc + currentVal.buyoutPrice;
     }, 0);
     return totalPrice / lots.length;
+}
+module.exports.getAveragePriceHistorical = (prices) => {
+    let itemCountExtraFromBulkSale = 0;
+    const totalPrice = prices.reduce((acc, currentVal) => {
+        itemCountExtraFromBulkSale += currentVal.amount - 1;
+        return acc + currentVal.price;
+    }, 0);
+    return totalPrice / (prices.length + itemCountExtraFromBulkSale);
 }
