@@ -2,3 +2,4 @@
 node_modules
 itemdb
 package-lock.json
+/data
