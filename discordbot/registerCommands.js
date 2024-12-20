@@ -80,7 +80,7 @@ const deleteNotification = new SlashCommandBuilder()
       .setDescription("ID of the notification you would like to delete");
   });
 const deleteAllNotifications = new SlashCommandBuilder()
-  .setName("deleteAll")
+  .setName("delete_all")
   .setDescription("Delete all currently active notification rules");
 try {
   rest

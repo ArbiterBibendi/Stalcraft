@@ -35,12 +35,19 @@ client.on(Events.InteractionCreate, async (interaction) => {
         itemID: itemdb.getItemIdByName(itemName),
         minPrice,
         maxPrice,
-        rarity: Number(rarity),
+        rarity,
         minLevel,
         maxLevel,
         oneShot,
         itemName,
       });
+      if (!notificationRule.itemID) {
+        await interaction.reply({
+          content: `No item could be found with the name ${notificationRules.itemName}`,
+          ephemeral: true,
+        });
+        return;
+      }
       notificationRule.save();
       await interaction.reply({
         content: `${itemName} ${minPrice} ${maxPrice} ${rarity}`,
@@ -91,9 +98,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       }
+    } else if (interaction.commandName === "delete_all") {
+      try {
+        await NotificationRulesModel.deleteMany({});
+        await interaction.reply({
+          content: `Successfully removed all notification rules`,
+          ephemeral: true,
+        });
+      } catch (e) {
+        await interaction.reply({
+          content: `Someting wong`,
+          ephemeral: true,
+        });
+      }
     }
-  } else if (interaction.isAutocomplete()) {
-    await interaction.respond([{ name: "monday", value: "monday1" }]);
   }
 });
 
