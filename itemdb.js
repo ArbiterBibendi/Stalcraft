@@ -9,7 +9,7 @@ const findItemByName = (name) => {
     console.log(`Could not find item by the name of ${name}`);
     return null;
   }
-  const item= require(`${globalItemDbPath}${listings[0].data}`);
+  const item = require(`${globalItemDbPath}${listings[0].data}`);
   return item;
 };
 const getItemIdByName = (name) => {

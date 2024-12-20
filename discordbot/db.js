@@ -26,6 +26,10 @@ const notificationRuleSchema = new Schema({
   minLevel: Number,
   maxLevel: Number,
   oneShot: Boolean,
+  itemName: {
+    type: String,
+    required: true,
+  },
 });
 
 module.exports.setupDb = setupDb;

@@ -34,27 +34,27 @@ const notify = new SlashCommandBuilder()
         //white common, Green Uncommon, blue special, pink rare, red exclusive, yellow legendary
         {
           name: "Common",
-          value: "0",
+          value: 0,
         },
         {
           name: "Uncommon",
-          value: "1",
+          value: 1,
         },
         {
           name: "Special",
-          value: "2",
+          value: 2,
         },
         {
           name: "Rare",
-          value: "3",
+          value: 3,
         },
         {
           name: "Exclusive",
-          value: "4",
+          value: 4,
         },
         {
           name: "Legendary",
-          value: "5",
+          value: 5,
         },
       ])
   )
@@ -67,10 +67,30 @@ const notify = new SlashCommandBuilder()
   .addBooleanOption((option) =>
     option.setName("one_shot").setDescription("Notify once and remove rule")
   );
+
+const viewNotifications = new SlashCommandBuilder()
+  .setName("view")
+  .setDescription("View all currently active notification rules");
+const deleteNotification = new SlashCommandBuilder()
+  .setName("delete")
+  .setDescription("Delete notification rule to stop being notified")
+  .addStringOption((option) => {
+    return option
+      .setName("notification_id")
+      .setDescription("ID of the notification you would like to delete");
+  });
+const deleteAllNotifications = new SlashCommandBuilder()
+  .setName("deleteAll")
+  .setDescription("Delete all currently active notification rules");
 try {
   rest
     .put(Routes.applicationGuildCommands(clientId, guild_id), {
-      body: [notify],
+      body: [
+        notify,
+        viewNotifications,
+        deleteNotification,
+        deleteAllNotifications,
+      ],
     })
     .then(() => {
       console.log(notify);
