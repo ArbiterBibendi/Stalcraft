@@ -2,7 +2,7 @@ module.exports.filterByQuality = (lots, qlt) => {
     if (qlt == -1) {
         return lots;
     }
-    return lots.filter((lot) => {
+    return lots?.filter((lot) => {
         return lot.additional.qlt == qlt;
     });
 }
