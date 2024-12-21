@@ -1,1 +1,0 @@
-Need to clone https://github.com/EXBO-Studio/stalcraft-database/ and name folder itemdb
