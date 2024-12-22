@@ -31,6 +31,13 @@ const notificationRuleSchema = new Schema({
     required: true,
   },
 });
+const channelSchema = new Schema({
+  id: {
+    type: String,
+    required: true,
+  },
+});
 
 module.exports.setupDb = setupDb;
 module.exports.notificationRuleSchema = notificationRuleSchema;
+module.exports.channelSchema = channelSchema;

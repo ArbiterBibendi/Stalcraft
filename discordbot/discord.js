@@ -3,19 +3,112 @@ require("dotenv").config();
 const { Client, Events, GatewayIntentBits } = require("discord.js");
 const token = process.env.DISCORD_KEY;
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const rarities = require("../utils").rarities;
 
 const mongoose = require("mongoose");
-const { notificationRuleSchema } = require("./db");
+const { notificationRuleSchema, channelSchema } = require("./db");
 const NotificationRulesModel = mongoose.model(
   "NotificationRule",
   notificationRuleSchema
 );
+const ChannelModel = mongoose.model("Channel", channelSchema);
 
 const itemdb = require("../itemdb");
+const api = require("../stalcraftapi");
 
+const getRarityName = (rarities, filteredLot) => {
+  const filteredRarities = rarities.filter((rarity) => {
+    return rarity.value == filteredLot.additional.qlt;
+  });
+  if (!filteredRarities) {
+    return "";
+  }
+  if (filteredRarities[0] == undefined) {
+    return "Unknown";
+  }
+
+  return filteredRarities[0].name;
+};
+const notifiedLots = [];
+const checkForItems = async () => {
+  const channelDoc = await ChannelModel.find({});
+  if (!channelDoc || channelDoc[0] == undefined) {
+    return;
+  }
+  const channelId = channelDoc[0].id;
+  const channel = await client.channels.fetch(channelId);
+  const notificationRules = await NotificationRulesModel.find({});
+  if (notificationRules.length < 1) {
+    return;
+  }
+  notificationRules.forEach(async (notificationRule) => {
+    let finalMessage = "";
+    try {
+      const response = await api.GetAuction(
+        itemdb.getItemIdByName(notificationRule.itemName),
+        undefined,
+        new URLSearchParams({
+          additional: true,
+          limit: 200,
+          sort: "buyout_price",
+          order: "asc",
+        })
+      );
+      const filteredLots = response.lots.filter((lot) => {
+        const inPriceRange =
+          lot.buyoutPrice >= notificationRule.minPrice &&
+          lot.buyoutPrice <= notificationRule.maxPrice;
+        const inLevelRange =
+          notificationRule.minLevel && notificationRule.maxLevel
+            ? lot.additional.upgrade_bonus >= notificationRule.minLevel &&
+              lot.additional.upgrade_bonus <= notificationRule.maxLevel
+            : true;
+        const matchesRarity = notificationRule.rarity
+          ? notificationRule.rarity == lot.additional.qlt
+          : true;
+        return inPriceRange && inLevelRange && matchesRarity;
+      });
+
+      filteredLots.forEach(async (filteredLot) => {
+        let found = false;
+        notifiedLots.forEach(async (notifiedLot) => {
+          if (JSON.stringify(notifiedLot) == JSON.stringify(filteredLot)) {
+            found = true;
+            return;
+          }
+        });
+        if (!found) {
+          finalMessage += `Item: **${String(
+            notificationRule.itemName.charAt(0).toUpperCase() +
+              notificationRule.itemName.slice(1)
+          )}** Rarity: **${getRarityName(
+            rarities,
+            filteredLot
+          )}** Buyout Price: **${filteredLot.buyoutPrice}**\r\n`;
+          notifiedLots.push(filteredLot);
+        }
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    if (finalMessage) {
+      await channel.send(finalMessage);
+    }
+  });
+};
 client.once(Events.ClientReady, async (readyClient) => {
   console.log(`Logged in as ${readyClient.user.tag}`);
   await mongoose.connect("mongodb://localhost:27017/StalcraftTools");
+  // start routine to automatically check all notification rules in the db and notify if there are any items fitting the rules
+  // maybe store already notified items in the db until either:
+  //                                                     the notification rule that it is associated with is deleted
+  //                                                     the item is bought, or falls off of the auction house
+
+  try {
+    const intervalId = setInterval(checkForItems, 5000);
+  } catch (e) {
+    console.error(e);
+  }
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -108,6 +201,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
       } catch (e) {
         await interaction.reply({
           content: `Someting wong`,
+          ephemeral: true,
+        });
+      }
+    } else if (interaction.commandName === "set_channel") {
+      const channel = interaction.options.getChannel("channel");
+      const channelDoc = new ChannelModel({
+        id: channel.id,
+      });
+      try {
+        channelDoc.save();
+        interaction.reply({
+          content: "Channel saved!",
+          ephemeral: true,
+        });
+      } catch (e) {
+        interaction.reply({
+          content: "UH OH. U H H OH OUH OH BUH OH UH OHUH OHUH HOH UH !!!",
           ephemeral: true,
         });
       }

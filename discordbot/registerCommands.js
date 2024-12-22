@@ -1,8 +1,9 @@
 require("dotenv").config();
+const rarities = require("../utils").rarities;
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 const token = process.env.DISCORD_KEY;
 const clientId = process.env.DISCORD_CLIENTID;
-const guild_id = "321200898816868354";
+const guild_id = "1319758702504312964"; //"321200898816868354";
 const rest = new REST().setToken(token);
 const notify = new SlashCommandBuilder()
   .setName("notify")
@@ -27,36 +28,7 @@ const notify = new SlashCommandBuilder()
       .setRequired(true)
   )
   .addNumberOption((option) =>
-    option
-      .setName("rarity")
-      .setDescription("Item rarity")
-      .setChoices([
-        //white common, Green Uncommon, blue special, pink rare, red exclusive, yellow legendary
-        {
-          name: "Common",
-          value: 0,
-        },
-        {
-          name: "Uncommon",
-          value: 1,
-        },
-        {
-          name: "Special",
-          value: 2,
-        },
-        {
-          name: "Rare",
-          value: 3,
-        },
-        {
-          name: "Exclusive",
-          value: 4,
-        },
-        {
-          name: "Legendary",
-          value: 5,
-        },
-      ])
+    option.setName("rarity").setDescription("Item rarity").setChoices(rarities)
   )
   .addNumberOption((option) =>
     option.setName("min_level").setDescription("Item's minimum upgrade level")
@@ -82,6 +54,12 @@ const deleteNotification = new SlashCommandBuilder()
 const deleteAllNotifications = new SlashCommandBuilder()
   .setName("delete_all")
   .setDescription("Delete all currently active notification rules");
+const setChannel = new SlashCommandBuilder()
+  .setName("set_channel")
+  .setDescription("Sets the channel that notifications will be posted in")
+  .addChannelOption((option) => {
+    return option.setName("channel").setDescription("The channel");
+  });
 try {
   rest
     .put(Routes.applicationGuildCommands(clientId, guild_id), {
@@ -90,6 +68,7 @@ try {
         viewNotifications,
         deleteNotification,
         deleteAllNotifications,
+        setChannel,
       ],
     })
     .then(() => {
