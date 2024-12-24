@@ -141,7 +141,6 @@ const GetAuction = async (
     cache: "no-store",
   });
   const body = await response.json();
-  console.log(response.headers);
   return body;
 };
 const GetCharacterProfile = async (character, region = defaultRegion) => {
