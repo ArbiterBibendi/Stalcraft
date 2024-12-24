@@ -222,6 +222,29 @@ client.on(Events.InteractionCreate, async (interaction) => {
         });
       }
     }
+  } else if (interaction.isAutocomplete()) {
+    const allItemNames = require("../itemdb/global/listing.json").map(
+      (item) => {
+        return item.name.lines.en;
+      }
+    );
+    const filteredItemNames = allItemNames.filter((itemName) => {
+      return itemName.includes(interaction.options.getFocused(false));
+    });
+    try {
+      await interaction.respond(
+        filteredItemNames
+          .map((itemName) => {
+            return {
+              name: itemName,
+              value: itemName,
+            };
+          })
+          .slice(0, 24)
+      );
+    } catch (e) {
+      await interaction.respond([{ name: "Error ", value: e.toString() }]);
+    }
   }
 });
 
