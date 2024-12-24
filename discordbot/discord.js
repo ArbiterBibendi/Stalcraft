@@ -1,6 +1,11 @@
 require("dotenv").config();
 
-const { Client, Events, GatewayIntentBits } = require("discord.js");
+const {
+  Client,
+  Events,
+  GatewayIntentBits,
+  EmbedBuilder,
+} = require("discord.js");
 const token = process.env.DISCORD_KEY;
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const rarities = require("../utils").rarities;
@@ -124,8 +129,16 @@ client.on(Events.InteractionCreate, async (interaction) => {
       const maxLevel = interaction.options.getNumber("max_level", false);
       const oneShot = interaction.options.getBoolean("OneShot", false);
 
+      const itemID = itemdb.getItemIdByName(itemName);
+      if (itemID == 0) {
+        await interaction.reply({
+          content: `Could not find item with name ${itemName}`,
+        });
+        console.error("No item named " + itemName);
+        return;
+      }
       const notificationRule = new NotificationRulesModel({
-        itemID: itemdb.getItemIdByName(itemName),
+        itemID,
         minPrice,
         maxPrice,
         rarity,
@@ -170,6 +183,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           \r\n`;
           return acc;
         }, ""),
+        ephemeral: true,
       });
     } else if (interaction.commandName === "delete") {
       const id = interaction.options.getString("notification_id", true);
@@ -221,6 +235,72 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       }
+    } else if (interaction.commandName === "price_history") {
+      let chartType = interaction.options.getString("chart_type");
+      if (chartType == null) {
+        chartType = "line";
+      }
+      const itemName = interaction.options.getString("name", true);
+      const itemID = itemdb.getItemIdByName(itemName);
+
+      if (itemID == 0) {
+        await interaction.reply({
+          content: `Could not find item with name ${itemName}`,
+        });
+        console.error("No item named " + itemName);
+        return;
+      }
+      const priceHistory = await api.GetAuctionPriceHistory(itemID);
+      const prices = priceHistory.prices;
+      const priceData = prices.map((history) => {
+        return {
+          x: history.time,
+          y: history.price / history.amount,
+        };
+      });
+      const chart = {
+        type: chartType,
+        data: {
+          datasets: [
+            {
+              fontColor: "green",
+              label: `${itemName}s`,
+              fill: false,
+              data: priceData,
+              lineTension: 0.2,
+              pointBorderColor: "red",
+              fontColor: "#14213d",
+            },
+          ],
+        },
+        options: {
+          scales: {
+            xAxes: [
+              {
+                type: "time",
+                ticks: {
+                  fontColor: "#14213d",
+                  fontSize: 14,
+                },
+              },
+            ],
+            yAxes: [
+              {
+                ticks: {
+                  fontColor: "#14213d",
+                  fontSize: 14,
+                },
+              },
+            ],
+          },
+        },
+      };
+      console.log(prices);
+      await interaction.reply({
+        content: `https://quickchart.io/chart?c=${encodeURIComponent(
+          JSON.stringify(chart)
+        )}&backgroundColor=${encodeURIComponent("rgb(242, 229, 88)")}`,
+      });
     }
   } else if (interaction.isAutocomplete()) {
     const allItemNames = require("../itemdb/global/listing.json").map(
@@ -237,6 +317,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       await interaction.respond(
         filteredItemNames
           .map((itemName) => {
+            1;
             return {
               name: itemName,
               value: itemName,

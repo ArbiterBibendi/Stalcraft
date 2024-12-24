@@ -60,6 +60,25 @@ const setChannel = new SlashCommandBuilder()
   .addChannelOption((option) => {
     return option.setName("channel").setDescription("The channel");
   });
+const priceHistory = new SlashCommandBuilder()
+  .setName("price_history")
+  .setDescription("Show price history of an item")
+  .addStringOption((option) =>
+    option
+      .setName("name")
+      .setDescription("Name of item")
+      .setRequired(true)
+      .setAutocomplete(true)
+  )
+  .addStringOption((option) =>
+    option
+      .setName("chart_type")
+      .setDescription("Type of chart")
+      .setChoices([
+        { name: "Line", value: "line" },
+        { name: "Scatter", value: "scatter" },
+      ])
+  );
 try {
   rest
     .put(Routes.applicationGuildCommands(clientId, guild_id), {
@@ -69,6 +88,7 @@ try {
         deleteNotification,
         deleteAllNotifications,
         setChannel,
+        priceHistory,
       ],
     })
     .then(() => {
