@@ -105,7 +105,7 @@ client.once(Events.ClientReady, async (readyClient) => {
   //                                                     the item is bought, or falls off of the auction house
 
   try {
-    const intervalId = setInterval(checkForItems, 5000);
+    const intervalId = setInterval(checkForItems, 10000);
   } catch (e) {
     console.error(e);
   }
@@ -229,7 +229,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
     );
     const filteredItemNames = allItemNames.filter((itemName) => {
-      return itemName.includes(interaction.options.getFocused(false));
+      return itemName
+        .toLowerCase()
+        .includes(interaction.options.getFocused(false).toLowerCase());
     });
     try {
       await interaction.respond(
@@ -243,7 +245,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
           .slice(0, 24)
       );
     } catch (e) {
-      await interaction.respond([{ name: "Error ", value: e.toString() }]);
+      console.log(e);
+      await interaction.respond([{ name: "Error ", value: e.message }]);
     }
   }
 });
