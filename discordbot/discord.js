@@ -110,7 +110,8 @@ client.once(Events.ClientReady, async (readyClient) => {
   //                                                     the item is bought, or falls off of the auction house
 
   try {
-    const intervalId = setInterval(checkForItems, 10000);
+    await checkForItems();
+    const intervalId = setInterval(checkForItems, 500);
   } catch (e) {
     console.error(e);
   }

@@ -75,132 +75,123 @@ const getHeaders = (endpoint) => {
       "Client-Secret": process.env.CLIENT_SECRET,
     };
   } else {
-    return { Authorization: `Bearer ${getKey(endpoint)}` };
+    return { Authorization: `Bearer ${getKeys(endpoint)}` };
   }
 };
-const defaultRegion = regions.NA;
-const GetRegions = async () => {
-  const endpoint = ENDPOINTS.GetRegions.base_url;
-  const response = await fetch(endpoint, {
-    headers: getHeaders(ENDPOINTS.GetRegions),
+
+// 'x-ratelimit-limit': '400',
+// 'x-ratelimit-remaining': '396',
+// 'x-ratelimit-reset': '1735144723184',
+let rateLimitLimit = 400;
+let rateLimitRemaining = 400;
+let rateLimitReset = Date.now();
+const ourFetch = async (url, endpoint) => {
+  const response = await fetch(url, {
+    headers: getHeaders(endpoint),
     cache: "no-store",
   });
   const body = await response.json();
+
+  for (const entry of response.headers.entries()) {
+    if (entry[0] == "x-ratelimit-limit") {
+      rateLimitLimit = entry[1];
+    } else if (entry[0] == "x-ratelimit-remaining") {
+      rateLimitRemaining = entry[1];
+    } else if (entry[0] == "x-ratelimit-reset") {
+      rateLimitReset = entry[1];
+    }
+  }
+  console.log(
+    `Remaining: ${rateLimitRemaining}. Resets in ${
+      (rateLimitReset - Date.now()) / 1000
+    } seconds.`
+  );
   return body;
 };
+
+const defaultRegion = regions.NA;
+const GetRegions = async () => {
+  const full_url = ENDPOINTS.GetRegions.base_url;
+  const response = await ourFetch(full_url, ENDPOINTS.GetRegions);
+  return response;
+};
 const GetEmissionStatus = async (region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetEmissionStatus.base_url.replace(
+  const full_url = ENDPOINTS.GetEmissionStatus.base_url.replace(
     "{region}",
     region
   );
-  const response = await fetch(endpoint, {
-    headers: getHeaders(ENDPOINTS.GetEmissionStatus),
-    cache: "no-store",
-  });
-  const body = await response.json();
-  return body;
+  const response = await ourFetch(full_url, ENDPOINTS.GetEmissionStatus);
+  return response;
 };
 const GetFriends = async (character, region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetFriends.base_url
+  const full_url = ENDPOINTS.GetFriends.base_url
     .replace("{character}", character)
     .replace("{region}", region);
-  const response = await fetch(endpoint, {
-    headers: getHeaders(ENDPOINTS.GetFriends),
-    cache: "no-store",
-  });
-  const body = await response.json();
-  return body;
+  const response = await ourFetch(full_url, ENDPOINTS.GetFriends);
+  return response;
 };
 const GetAuctionPriceHistory = async (
   itemId,
   region = defaultRegion,
   urlSearchParams = new URLSearchParams()
 ) => {
-  const endpoint =
+  const full_url =
     ENDPOINTS.GetAuctionPriceHistory.base_url
       .replace("{item}", itemId)
       .replace("{region}", region) + `?${urlSearchParams.toString()}`;
-  const response = await fetch(endpoint, {
-    headers: getHeaders(ENDPOINTS.GetAuctionPriceHistory),
-    cache: "no-store",
-  });
-  const body = await response.json();
-  return body;
+  const response = await ourFetch(full_url, ENDPOINTS.GetAuctionPriceHistory);
+  return response;
 };
 const GetAuction = async (
   itemId,
   region = defaultRegion,
   urlSearchParams = new URLSearchParams()
 ) => {
-  const endpoint =
+  const full_url =
     ENDPOINTS.GetAuction.base_url
       .replace("{item}", itemId)
       .replace("{region}", region) + `?${urlSearchParams.toString()}`;
-  const response = await fetch(endpoint, {
-    headers: getHeaders(ENDPOINTS.GetAuction),
-    cache: "no-store",
-  });
-  const body = await response.json();
-  return body;
+  const response = await ourFetch(full_url, ENDPOINTS.GetAuction);
+  return response;
 };
 const GetCharacterProfile = async (character, region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetCharacterProfile.base_url
+  const full_url = ENDPOINTS.GetCharacterProfile.base_url
     .replace("{character}", character)
     .replace("{region}", region);
-  const response = await fetch(endpoint, {
-    headers: getHeaders(ENDPOINTS.GetCharacterProfile),
-    cache: "no-store",
-  });
-  const body = await response.json();
-  return body;
+  const response = await ourFetch(full_url, ENDPOINTS.GetCharacterProfile);
+  return response;
 };
 const GetCharacterList = async (region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetCharacterList.base_url.replace(
+  const full_url = ENDPOINTS.GetCharacterList.base_url.replace(
     "{region}",
     region
   );
-  const response = await fetch(endpoint, {
-    headers: getHeaders(ENDPOINTS.GetCharacterList),
-    cache: "no-store",
-  });
-  const body = await response.json();
-  return body;
+  const response = await ourFetch(full_url, ENDPOINTS.GetCharacterList);
+  return response;
 };
 const GetClanInfo = async (clan_id, region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetClanInfo.base_url
+  const full_url = ENDPOINTS.GetClanInfo.base_url
     .replace("{clan-id}", clan_id)
     .replace("{region}", region);
-  const response = await fetch(endpoint, {
-    headers: getHeaders(ENDPOINTS.GetClanInfo),
-    cache: "no-store",
-  });
-  const body = await response.json();
-  return body;
+  const response = await ourFetch(full_url, ENDPOINTS.GetClanInfo);
+  return response;
 };
 const GetClanMembers = async (clan_id, region = defaultRegion) => {
-  const endpoint = ENDPOINTS.GetClanMembers.base_url
+  const full_url = ENDPOINTS.GetClanMembers.base_url
     .replace("{clan-id}", clan_id)
     .replace("{region}", region);
-  const response = await fetch(endpoint, {
-    headers: getHeaders(ENDPOINTS.GetClanMembers),
-    cache: "no-store",
-  });
-  const body = await response.json();
-  return body;
+  const response = await ourFetch(full_url, ENDPOINTS.GetClanMembers);
+  return response;
 };
 const GetClanList = async (
   region = defaultRegion,
   urlSearchParams = new URLSearchParams()
 ) => {
-  const endpoint =
+  const full_url =
     ENDPOINTS.GetClanList.base_url.replace("{region}", region) +
     `?${urlSearchParams.toString()}`;
-  const response = await fetch(endpoint, {
-    headers: getHeaders(ENDPOINTS.GetClanList),
-    cache: "no-store",
-  });
-  const body = await response.json();
-  return body;
+  const response = await ourFetch(full_url, ENDPOINTS.GetClanList);
+  return response;
 };
 
 module.exports.GetRegions = GetRegions;
