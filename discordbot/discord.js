@@ -106,12 +106,12 @@ client.once(Events.ClientReady, async (readyClient) => {
   await mongoose.connect("mongodb://localhost:27017/StalcraftTools");
   // start routine to automatically check all notification rules in the db and notify if there are any items fitting the rules
   // maybe store already notified items in the db until either:
-  //                                                     the notification rule that it is associated with is deleted
+  //                                                     the notification listing that it is associated with is deleted
   //                                                     the item is bought, or falls off of the auction house
 
   try {
     await checkForItems();
-    const intervalId = setInterval(checkForItems, 500);
+    const intervalId = setInterval(checkForItems, 2500);
   } catch (e) {
     console.error(e);
   }
@@ -171,19 +171,17 @@ client.on(Events.InteractionCreate, async (interaction) => {
         return;
       }
       await interaction.reply({
-        content: notificationRules.reduce((acc, notificationRule) => {
-          acc += `**${notificationRule._id}**: 
+        content: notificationRules
+          .reduce((acc, notificationRule) => {
+            acc += `**${notificationRule._id}**: 
           **Item:**  ${notificationRule.itemName}
-          **ItemID:**  ${notificationRule.itemID}
-          **minPrice:**  ${notificationRule.minPrice} 
-          **maxPrice:**  ${notificationRule.maxPrice} 
-          **rarity:**  ${notificationRule.rarity} 
-          **minLevel:**  ${notificationRule.minLevel} 
-          **maxLevel:**  ${notificationRule.maxLevel} 
-          **oneShot:**  ${notificationRule.oneShot}
+          **ID:**  ${notificationRule.itemID}
+          **min:**  ${notificationRule.minPrice} 
+          **max:**  ${notificationRule.maxPrice} 
           \r\n`;
-          return acc;
-        }, ""),
+            return acc;
+          }, "")
+          .slice(0, 2000),
         ephemeral: true,
       });
     } else if (interaction.commandName === "delete") {
@@ -201,6 +199,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
           ephemeral: true,
         });
       } catch (e) {
+        console.error(e);
         await interaction.reply({
           content: `Someting wong`,
           ephemeral: true,
