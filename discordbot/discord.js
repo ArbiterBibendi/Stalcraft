@@ -83,13 +83,26 @@ const checkForItems = async () => {
           }
         });
         if (!found) {
-          finalMessage += `Item: **${String(
+          // add the lot to the final message if is unique for this session
+          console.log(notificationRule.notifyRole);
+          const user = notificationRule.notifyUser
+            ? notificationRule.notifyUser
+            : "";
+          const role = notificationRule.notifyRole
+            ? notificationRule.notifyRole
+            : "";
+          const item = `Item: **${String(
             notificationRule.itemName.charAt(0).toUpperCase() +
               notificationRule.itemName.slice(1)
-          )}** Rarity: **${getRarityName(
-            rarities,
-            filteredLot
-          )}** Buyout Price: **${filteredLot.buyoutPrice}**\r\n`;
+          )}**`;
+          const rarityName = getRarityName(rarities, filteredLot);
+          const rarity =
+            rarityName != "Unknown" ? `Rarity: **${rarityName}**` : "";
+          finalMessage += user;
+          finalMessage += role;
+          finalMessage += item;
+          finalMessage += rarity;
+          finalMessage += `  Buyout Price: **${filteredLot.buyoutPrice}**\r\n`;
           notifiedLots.push(filteredLot);
         }
       });
@@ -128,7 +141,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
       const rarity = interaction.options.getNumber("rarity", false);
       const minLevel = interaction.options.getNumber("min_level", false);
       const maxLevel = interaction.options.getNumber("max_level", false);
-      const oneShot = interaction.options.getBoolean("OneShot", false);
+      const oneShot = interaction.options.getBoolean("one_shot", false);
+      const notifyUser = interaction.options.getUser("notify_user");
+      const notifyRole = interaction.options.getRole("notify_role");
 
       const itemID = itemdb.getItemIdByName(itemName);
       if (itemID == 0) {
@@ -147,6 +162,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
         maxLevel,
         oneShot,
         itemName,
+        notifyUser,
+        notifyRole,
       });
       if (!notificationRule.itemID) {
         await interaction.reply({
@@ -219,6 +236,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         });
       }
     } else if (interaction.commandName === "set_channel") {
+      await ChannelModel.deleteMany({});
       const channel = interaction.options.getChannel("channel");
       const channelDoc = new ChannelModel({
         id: channel.id,

@@ -30,6 +30,8 @@ const notificationRuleSchema = new Schema({
     type: String,
     required: true,
   },
+  notifyUser: String,
+  notifyRole: String,
 });
 const channelSchema = new Schema({
   id: {

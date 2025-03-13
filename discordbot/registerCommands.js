@@ -36,9 +36,12 @@ const notify = new SlashCommandBuilder()
   .addNumberOption((option) =>
     option.setName("max_level").setDescription("Item's maximum upgrade level")
   )
-  .addBooleanOption((option) =>
-    option.setName("one_shot").setDescription("Notify once and remove rule")
-  );
+  .addUserOption((option) => {
+    return option.setName("notify_user").setDescription("User to notify");
+  })
+  .addRoleOption((option) => {
+    return option.setName("notify_role").setDescription("Role to notify");
+  });
 
 const viewNotifications = new SlashCommandBuilder()
   .setName("view")
