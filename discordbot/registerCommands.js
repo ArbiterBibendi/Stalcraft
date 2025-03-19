@@ -82,6 +82,9 @@ const priceHistory = new SlashCommandBuilder()
         { name: "Scatter", value: "scatter" },
       ])
   );
+const suggestLot = new SlashCommandBuilder()
+  .setName("suggest_lot")
+  .setDescription("Suggest a lot to buyout");
 try {
   rest
     .put(Routes.applicationGuildCommands(clientId, guild_id), {
@@ -92,6 +95,7 @@ try {
         deleteAllNotifications,
         setChannel,
         priceHistory,
+        suggestLot,
       ],
     })
     .then(() => {

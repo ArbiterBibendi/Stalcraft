@@ -322,6 +322,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
       } catch (e) {
         console.error(e);
       }
+    } else if (interaction.commandName == "suggest_lot") {
+      try {
+        await interaction.reply({
+          content: `Monday`,
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
   } else if (interaction.isAutocomplete()) {
     const allItemNames = require("../itemdb/global/listing.json").map(
