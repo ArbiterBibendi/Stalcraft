@@ -1,13 +1,8 @@
 const { Schema } = require("mongoose");
+const mongoose = require("mongoose");
 
-const setupDb = async () => {
-  const { MongoClient } = require("mongodb");
-
-  const mongoURL = "mongodb://localhost:27017";
-  const mongoClient = new MongoClient(mongoURL);
-  await mongoClient.connect();
-  const db = mongoClient.db("StalcraftTools");
-  return db;
+const connectToDb = async () => {
+  return await mongoose.connect("mongodb://localhost:27017/StalcraftTools");
 };
 const notificationRuleSchema = new Schema({
   itemID: {
@@ -40,6 +35,12 @@ const channelSchema = new Schema({
   },
 });
 
-module.exports.setupDb = setupDb;
-module.exports.notificationRuleSchema = notificationRuleSchema;
-module.exports.channelSchema = channelSchema;
+const notificationRuleModel = mongoose.model(
+  "NotificationRule",
+  notificationRuleSchema
+);
+const channelModel = mongoose.model("Channel", channelSchema);
+
+module.exports.connectToDb = connectToDb;
+module.exports.notificationRuleModel = notificationRuleModel;
+module.exports.channelModel = channelModel;

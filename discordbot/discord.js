@@ -1,25 +1,16 @@
 require("dotenv").config();
-
 const {
   Client,
   Events,
   GatewayIntentBits,
   EmbedBuilder,
 } = require("discord.js");
+const api = require("../stalcraftapi");
 const token = process.env.DISCORD_KEY;
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-const rarities = require("../utils").rarities;
-
-const mongoose = require("mongoose");
-const { notificationRuleSchema, channelSchema } = require("./db");
-const NotificationRulesModel = mongoose.model(
-  "NotificationRule",
-  notificationRuleSchema
-);
-const ChannelModel = mongoose.model("Channel", channelSchema);
-
 const itemdb = require("../itemdb");
-const api = require("../stalcraftapi");
+const rarities = require("../utils").rarities;
+const { notificationRuleModel, channelModel, connectToDb } = require("./db");
 
 const getRarityName = (rarities, filteredLot) => {
   const filteredRarities = rarities.filter((rarity) => {
@@ -36,13 +27,13 @@ const getRarityName = (rarities, filteredLot) => {
 };
 const notifiedLots = [];
 const checkForItems = async () => {
-  const channelDoc = await ChannelModel.find({});
+  const channelDoc = await channelModel.find({});
   if (!channelDoc || channelDoc[0] == undefined) {
     return;
   }
   const channelId = channelDoc[0].id;
   const channel = await client.channels.fetch(channelId);
-  const notificationRules = await NotificationRulesModel.find({});
+  const notificationRules = await notificationRuleModel.find({});
   if (notificationRules.length < 1) {
     return;
   }
@@ -116,7 +107,7 @@ const checkForItems = async () => {
 };
 client.once(Events.ClientReady, async (readyClient) => {
   console.log(`Logged in as ${readyClient.user.tag}`);
-  await mongoose.connect("mongodb://localhost:27017/StalcraftTools");
+  await connectToDb();
   // start routine to automatically check all notification rules in the db and notify if there are any items fitting the rules
   // maybe store already notified items in the db until either:
   //                                                     the notification listing that it is associated with is deleted
@@ -153,7 +144,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         console.error("No item named " + itemName);
         return;
       }
-      const notificationRule = new NotificationRulesModel({
+      const notificationRule = new notificationRuleModel({
         itemID,
         minPrice,
         maxPrice,
@@ -178,7 +169,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         ephemeral: true,
       });
     } else if (interaction.commandName === "view") {
-      const notificationRules = await NotificationRulesModel.find({});
+      const notificationRules = await notificationRuleModel.find({});
       if (notificationRules.length < 1) {
         await interaction.reply({
           content:
@@ -210,7 +201,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         });
       }
       try {
-        await NotificationRulesModel.findByIdAndDelete(id);
+        await notificationRuleModel.findByIdAndDelete(id);
         await interaction.reply({
           content: `Successfully removed notification rule`,
           ephemeral: true,
@@ -224,7 +215,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       }
     } else if (interaction.commandName === "delete_all") {
       try {
-        await NotificationRulesModel.deleteMany({});
+        await notificationRuleModel.deleteMany({});
         await interaction.reply({
           content: `Successfully removed all notification rules`,
           ephemeral: true,
@@ -236,9 +227,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
         });
       }
     } else if (interaction.commandName === "set_channel") {
-      await ChannelModel.deleteMany({});
+      await channelModel.deleteMany({});
       const channel = interaction.options.getChannel("channel");
-      const channelDoc = new ChannelModel({
+      const channelDoc = new channelModel({
         id: channel.id,
       });
       try {
@@ -323,6 +314,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
         console.error(e);
       }
     } else if (interaction.commandName == "suggest_lot") {
+      // Get list of items to scan
+      const itemsToScan = itemdb.getItemsOfType(itemdb.ItemCategories.Armor);
+      console.log(itemsToScan.length);
+      // Scan price history of all
+      console.log(itemdb.getItemId(itemsToScan[0]));
+      //const priceHistory = await api.GetAuctionPriceHistory();
+
+      // Sort by priceHistory.total from highest to lowest
+      // try to find good lots
       try {
         await interaction.reply({
           content: `Monday`,
