@@ -313,12 +313,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
           },
         },
       };
-      console.log(prices);
-      await interaction.reply({
-        content: `https://quickchart.io/chart?c=${encodeURIComponent(
-          JSON.stringify(chart)
-        )}&backgroundColor=${encodeURIComponent("rgb(242, 229, 88)")}`,
-      });
+      try {
+        await interaction.reply({
+          content: `https://quickchart.io/chart?c=${encodeURIComponent(
+            JSON.stringify(chart)
+          )}&backgroundColor=${encodeURIComponent("rgb(242, 229, 88)")}`,
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
   } else if (interaction.isAutocomplete()) {
     const allItemNames = require("../itemdb/global/listing.json").map(
