@@ -1,4 +1,5 @@
 const { URLSearchParams } = require("url");
+const { sleep } = require("utils");
 
 require("dotenv").config();
 const env = process.env.ENVIRONMENT;
@@ -86,6 +87,12 @@ let rateLimitLimit = 400;
 let rateLimitRemaining = 400;
 let rateLimitReset = Date.now();
 const ourFetch = async (url, endpoint) => {
+  if (rateLimitRemaining < 15) {
+    console.log(
+      `Rate limit exceeded. Waiting ${rateLimitReset - Date.now()} seconds`
+    );
+    utils.sleep(rateLimitReset - Date.now());
+  }
   const response = await fetch(url, {
     headers: getHeaders(endpoint),
     cache: "no-store",
