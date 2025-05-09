@@ -314,29 +314,45 @@ client.on(Events.InteractionCreate, async (interaction) => {
         console.error(e);
       }
     } else if (interaction.commandName == "suggest_lot") {
+      interaction.deferReply();
       // Get list of items to scan
-      const itemsToScan = itemdb.getItemsOfType(itemdb.ItemCategories.Armor);
-      console.log(itemsToScan.length);
+      const itemsToScan = itemdb.getItems();
       // Scan price history of all
-      console.log(itemdb.getItemId(itemsToScan[0]));
-      //const priceHistory = await api.GetAuctionPriceHistory();
+      let priceHistories = [];
+      for (let i = 0; i < itemsToScan.length; i++) {
+        console.log(`Scanning ${itemdb.getEnglishName(itemsToScan[i])}`);
+        let priceHistory = await api.GetAuctionPriceHistory(
+          itemdb.getItemId(itemsToScan[i])
+        );
+        priceHistory.itemName = itemdb.getEnglishName(itemsToScan[i]);
 
-      // Sort by priceHistory.total from highest to lowest
-      // try to find good lots
+        priceHistories = [...priceHistories, priceHistory];
+      }
+      const sortedPriceHistories = priceHistories.sort(
+        (a, b) => b.total - a.total
+      ); // descending
+      console.log(sortedPriceHistories);
+      let reply = "";
+      for (let i = 0; i < sortedPriceHistories.length; i++) {
+        reply +=
+          sortedPriceHistories[i].itemName +
+          ": " +
+          sortedPriceHistories[i].total +
+          "\n";
+      }
+
       try {
-        await interaction.reply({
-          content: `Monday`,
+        await interaction.editReply({
+          content: reply.slice(0, 1500),
         });
       } catch (e) {
         console.error(e);
       }
     }
   } else if (interaction.isAutocomplete()) {
-    const allItemNames = require("../itemdb/global/listing.json").map(
-      (item) => {
-        return item.name.lines.en;
-      }
-    );
+    const allItemNames = itemdb.getItems().map((item) => {
+      return item.name.lines.en;
+    });
     const filteredItemNames = allItemNames.filter((itemName) => {
       return itemName
         .toLowerCase()

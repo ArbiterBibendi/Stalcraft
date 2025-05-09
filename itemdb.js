@@ -23,7 +23,8 @@ const getEnglishName = (item) => {
   return item.name.type === "translation" ? item.name.lines.en : item.name.text;
 };
 const getItemId = (item) => {
-  return item.data.split("/")[4].split(".")[0];
+  const arr = item.data.split(".")[0].split("/");
+  return arr[arr.length - 1];
 };
 const ItemCategories = {
   Armor: "armor",
@@ -46,10 +47,15 @@ const getItemsOfType = (category) => {
   });
   return listings;
 };
+const getItems = () => {
+  const listings = itemListings;
+  return listings;
+};
 
 module.exports.findItemByName = findItemByName;
 module.exports.getItemIdByName = getItemIdByName;
 module.exports.getEnglishName = getEnglishName;
 module.exports.getItemsOfType = getItemsOfType;
+module.exports.getItems = getItems;
 module.exports.ItemCategories = ItemCategories;
 module.exports.getItemId = getItemId;
