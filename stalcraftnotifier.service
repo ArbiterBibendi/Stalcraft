@@ -1,0 +1,13 @@
+[Unit]
+Description=Stalcraft discord notifier
+After=stalcraftdb.service
+
+[Service]
+Type=simple
+User=admin
+WorkingDirectory=/home/admin/Stalcraft
+ExecStart=/usr/bin/npm run discord
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
